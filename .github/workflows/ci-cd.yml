@@ -72,9 +72,9 @@ jobs:
       - name: Determine Final Docker Tag
         id: docker-tag
         run: |
-          if [ -n "${{ github.event.inputs.custom_tag }}" ]; then
-            echo "Using user-specified custom tag: ${{ github.event.inputs.custom_tag }}"
-            echo "tag=${{ github.event.inputs.custom_tag }}" >> $GITHUB_OUTPUT
+          if [ -n "${{ inputs.custom_tag }}" ]; then
+            echo "Using user-specified custom tag: ${{ inputs.custom_tag }}"
+            echo "tag=${{ inputs.custom_tag }}" >> $GITHUB_OUTPUT
           else
             echo "Using automated semver tag: ${{ steps.get-version.outputs.version }}"
             echo "tag=${{ steps.get-version.outputs.version }}" >> $GITHUB_OUTPUT
@@ -102,9 +102,9 @@ jobs:
       - name: Configure secure air-gapped build arguments
         id: build-args
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.pypi_index_url }}" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.pypi_index_url }}" ]; then
             echo "offline_find_links=" >> $GITHUB_OUTPUT
-            echo "pypi_index_url=${{ github.event.inputs.pypi_index_url }}" >> $GITHUB_OUTPUT
+            echo "pypi_index_url=${{ inputs.pypi_index_url }}" >> $GITHUB_OUTPUT
           else
             echo "offline_find_links=/app/pyrepo" >> $GITHUB_OUTPUT
             echo "pypi_index_url=" >> $GITHUB_OUTPUT

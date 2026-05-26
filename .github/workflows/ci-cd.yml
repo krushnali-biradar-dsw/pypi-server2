@@ -105,8 +105,8 @@ jobs:
           context: .
           file: component/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ meta.outputs.tags }}
-          labels: ${{ meta.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             PYPI_INDEX_URL=${{ github.event.inputs.pypi_index_url || 'http://host.docker.internal:8080/simple' }}
           cache-from: type=gha

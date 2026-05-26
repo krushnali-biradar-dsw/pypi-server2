@@ -75,7 +75,7 @@ def sync():
             if pkg_name not in downloaded:
                 missing.append(req)
             else:
-                print(f"✓ Package '{pkg_name}' is already cached in pyrepo/.")
+                print(f"[OK] Package '{pkg_name}' is already cached in pyrepo/.")
         else:
             missing.append(req)
             
@@ -92,16 +92,13 @@ def sync():
         sys.executable, "-m", "pip", "download",
         "--dest", str(pyrepo_path),
         "--find-links", str(pyrepo_path),
+        "--only-binary=:all:",
+        "--platform", "manylinux2014_x86_64",
+        "--implementation", "cp",
+        "--python-version", "3.10"
     ]
-    # If running on Windows, force downloading Linux x86_64 wheels for python 3.10 (our Docker target)
-    if os.name == 'nt':
-        print("Running on Windows host. Forcing Linux x86_64 Python 3.10 offline wheels...")
-        cmd.extend([
-            "--platform", "manylinux2014_x86_64",
-            "--only-binary=:all:",
-            "--implementation", "cp",
-            "--python-version", "3.10"
-        ])
+    # Log the targeting parameters
+    print("Forcing Linux x86_64 Python 3.10 pre-compiled binary wheels...")
         
     for m in missing:
         cmd.append(m)

@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE_NAME: ${{ github.event.repository.name }}
+  IMAGE_NAME: pypi-server-automation-testing
 
 jobs:
   build-and-push:

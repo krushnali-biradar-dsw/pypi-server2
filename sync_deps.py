@@ -93,6 +93,16 @@ def sync():
         "--dest", str(pyrepo_path),
         "--find-links", str(pyrepo_path),
     ]
+    # If running on Windows, force downloading Linux x86_64 wheels for python 3.10 (our Docker target)
+    if os.name == 'nt':
+        print("Running on Windows host. Forcing Linux x86_64 Python 3.10 offline wheels...")
+        cmd.extend([
+            "--platform", "manylinux2014_x86_64",
+            "--only-binary=:all:",
+            "--implementation", "cp",
+            "--python-version", "3.10"
+        ])
+        
     for m in missing:
         cmd.append(m)
         

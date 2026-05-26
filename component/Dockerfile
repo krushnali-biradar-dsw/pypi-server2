@@ -17,6 +17,6 @@ RUN pip install --no-index --find-links=/app/pyrepo -r requirements.txt
 RUN rm -rf /app/pyrepo
 
 # 4. Copy ONLY the Pyarmor obfuscated code, never the raw source
-COPY component/dist/ /app/
+COPY dist/ /app/
 
 CMD ["python", "main.py"]

@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE_NAME: pypi-server-automation-testing
+  IMAGE_NAME: ${{ github.event.repository.name }}
 
 jobs:
   build-and-push:
@@ -72,9 +72,9 @@ jobs:
       - name: Determine Final Docker Tag
         id: docker-tag
         run: |
-          if [ -n "${{ github.event.inputs['custom_tag'] }}" ]; then
-            echo "Using user-specified custom tag: ${{ github.event.inputs['custom_tag'] }}"
-            echo "tag=${{ github.event.inputs['custom_tag'] }}" >> $GITHUB_OUTPUT
+          if [ -n "${{ github.event.inputs.custom_tag }}" ]; then
+            echo "Using user-specified custom tag: ${{ github.event.inputs.custom_tag }}"
+            echo "tag=${{ github.event.inputs.custom_tag }}" >> $GITHUB_OUTPUT
           else
             echo "Using automated semver tag: ${{ steps.get-version.outputs.version }}"
             echo "tag=${{ steps.get-version.outputs.version }}" >> $GITHUB_OUTPUT
@@ -99,17 +99,6 @@ jobs:
             type=raw,value=${{ steps.docker-tag.outputs.tag }}
             type=raw,value=latest
 
-      - name: Configure secure air-gapped build arguments
-        id: build-args
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs['pypi_index_url'] }}" ]; then
-            echo "offline_find_links=" >> $GITHUB_OUTPUT
-            echo "pypi_index_url=${{ github.event.inputs['pypi_index_url'] }}" >> $GITHUB_OUTPUT
-          else
-            echo "offline_find_links=/app/pyrepo" >> $GITHUB_OUTPUT
-            echo "pypi_index_url=" >> $GITHUB_OUTPUT
-          fi
-
       - name: Build and Push Secure Docker Image
         uses: docker/build-push-action@v5
         with:
@@ -119,7 +108,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            OFFLINE_FIND_LINKS=${{ steps.build-args.outputs.offline_find_links }}
-            PYPI_INDEX_URL=${{ steps.build-args.outputs.pypi_index_url }}
+            OFFLINE_FIND_LINKS=${{ github.event.inputs.pypi_index_url == '' && '/app/pyrepo' || '' }}
+            PYPI_INDEX_URL=${{ github.event.inputs.pypi_index_url }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

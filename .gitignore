@@ -1,0 +1,19 @@
+# Python caches and build files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Local build and obfuscation outputs
+dist/
+.pyarmor/
+
+# Local air-gapped package directory (downloaded dynamically)
+pyrepo/
+.pip_cache/
+
+# Environment files
+.env
+.env.local
+.env.*.local

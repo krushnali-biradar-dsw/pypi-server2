@@ -1,0 +1,7 @@
+# Ignore everything by default to prevent leaking raw source code
+*
+
+# Whitelist ONLY what is strictly required for the offline container build
+!dist/
+!component/requirements.txt
+!pyrepo/

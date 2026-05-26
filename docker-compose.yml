@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  pypi-server:
+    image: pypiserver/pypiserver:latest
+    container_name: local-pypi-server
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./pyrepo:/data/packages
+    command: -p 8080 -a . -P . /data/packages
+    restart: always

@@ -1,0 +1,7 @@
+# Ignore everything first...
+*
+
+# ...then allow only what the Dockerfile explicitly needs
+!dist/
+!requirements.txt
+!../pyrepo/

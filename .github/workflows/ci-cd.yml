@@ -1,0 +1,94 @@
+name: Secure Air-Gapped CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install sync and obfuscation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyarmor requests
+
+      - name: Cache PyPI local packages (pyrepo)
+        id: cache-pyrepo
+        uses: actions/cache@v4
+        with:
+          path: pyrepo
+          key: ${{ runner.os }}-pyrepo-${{ hashFiles('component/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pyrepo-
+
+      - name: Run Differential Dependency Sync
+        run: |
+          python sync_deps.py
+
+      - name: Run Code Obfuscation (Pyarmor)
+        run: |
+          chmod +x component/build.sh
+          ./component/build.sh
+
+      - name: Determine Next Semantic Version
+        id: get-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEXT_VER=$(python get_next_version.py)
+          echo "Calculated Next Version: $NEXT_VER"
+          echo "version=$NEXT_VER" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ steps.get-version.outputs.version }}
+            type=raw,value=latest
+
+      - name: Build and Push Secure Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: component/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

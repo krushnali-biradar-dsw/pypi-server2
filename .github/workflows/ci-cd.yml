@@ -108,9 +108,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            PYPI_INDEX_URL=${{ github.event.inputs.pypi_index_url || 'http://host.docker.internal:8080/simple' }}
+            OFFLINE_FIND_LINKS=${{ github.event.inputs.pypi_index_url == '' && '/app/pyrepo' || '' }}
+            PYPI_INDEX_URL=${{ github.event.inputs.pypi_index_url }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          # Add host.docker.internal mapping so build container can contact host gateway
-          add-hosts: |
-            host.docker.internal:host-gateway

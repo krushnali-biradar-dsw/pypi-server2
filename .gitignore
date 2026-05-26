@@ -17,3 +17,7 @@ pyrepo/
 .env
 .env.local
 .env.*.local
+
+# Logs
+*.log
+

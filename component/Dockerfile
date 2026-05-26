@@ -17,8 +17,7 @@ COPY pyrepo* /app/pyrepo/
 # 2. STRICT OFFLINE INSTALL: Disable internet access for pip
 # If OFFLINE_FIND_LINKS is set, use find-links. Otherwise, use the private local PyPI server.
 # Using --index-url and no other options guarantees pip never accesses public PyPI.
-RUN pip install --no-cache-dir --upgrade pip && \
-    if [ -n "$OFFLINE_FIND_LINKS" ]; then \
+RUN if [ -n "$OFFLINE_FIND_LINKS" ]; then \
       echo "Installing from local directory: $OFFLINE_FIND_LINKS" && \
       pip install --no-cache-dir --no-index --find-links=$OFFLINE_FIND_LINKS -r requirements.txt; \
     else \

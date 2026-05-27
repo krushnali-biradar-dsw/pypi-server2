@@ -1,7 +1,12 @@
-# Ignore everything first...
-*
+# Standard Ignore Rules
+.git/
+.github/
+verify_pipeline.py
+*.log
 
-# ...then allow only what the Dockerfile explicitly needs
-!dist/**
-!requirements.txt
-!../pyrepo/**
+# Python Caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/

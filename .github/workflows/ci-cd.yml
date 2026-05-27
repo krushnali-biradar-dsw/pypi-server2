@@ -14,7 +14,7 @@ on:
       pypi_index_url:
         description: 'Local/Tunnel PyPI Server URL (e.g., ngrok/Tailscale URL or http://host.docker.internal:8080/simple)'
         required: false
-        default: 'http://host.docker.internal:8080/simple'
+        default: ''
 
 permissions:
   contents: read

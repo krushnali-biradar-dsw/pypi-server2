@@ -2,6 +2,6 @@
 *
 
 # Whitelist ONLY what is strictly required for the offline container build
-!dist/
+!dist/**
 !component/requirements.txt
-!pyrepo/
+!pyrepo/**
